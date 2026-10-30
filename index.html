@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>MeetingAutopsy — AI-Powered Meeting Intelligence</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+<div class="bg-orbs">
+  <div class="orb orb-1"></div>
+  <div class="orb orb-2"></div>
+  <div class="orb orb-3"></div>
+</div>
+
+<div class="app">
+  <header>
+    <div class="logo">
+      <div class="logo-icon">🔬</div>
+      <div class="logo-text">MeetingAutopsy</div>
+      <div class="logo-badge">AI POWERED</div>
+    </div>
+    <div class="header-right">
+      <button class="theme-toggle" id="themeToggle" onclick="toggleTheme()" title="Toggle theme">🌙</button>
+      <button class="api-key-btn" id="apiKeyBtn" onclick="openModal()">
+        <div class="api-key-dot"></div>
+        <span id="apiKeyBtnText">Local AI Engine</span>
+      </button>
+    </div>
+  </header>
+
+  <main>
+    <div class="hero">
+      <div class="hero-eyebrow" id="engineBadge">⚡ Python Speech AI & Gemini Hybrid Engine</div>
+      <h1>Dissect Your<br /><span>Meeting's DNA</span></h1>
+      <p>Upload any meeting recording. Get instant, high-accuracy AI insights, speaker speech transcription, action items, and a meeting health score in seconds.</p>
+    </div>
+
+    <div class="upload-section">
+      <div class="upload-zone" id="uploadZone"
+           ondragover="handleDragOver(event)" ondragleave="handleDragLeave(event)"
+           ondrop="handleDrop(event)" onclick="document.getElementById('fileInput').click()">
+        <div class="upload-icon" id="uploadIcon">🎙️</div>
+        <div class="upload-title" id="uploadTitle">Drop your meeting recording here</div>
+        <div class="upload-subtitle" id="uploadSubtitle">or click to browse video / audio files</div>
+        <div class="upload-formats">
+          <span class="format-badge">.mp3</span>
+          <span class="format-badge">.mp4</span>
+          <span class="format-badge">.wav</span>
+          <span class="format-badge">.m4a</span>
+          <span class="format-badge">.ogg</span>
+          <span class="format-badge">.webm</span>
+        </div>
+      </div>
+      <input type="file" id="fileInput" accept="audio/*,video/*" onchange="handleFileSelect(event)" />
+
+      <div class="file-preview" id="filePreview">
+        <div class="file-icon" id="previewIcon">🎵</div>
+        <div class="file-info">
+          <div class="file-name" id="fileName">meeting.mp3</div>
+          <div class="file-size" id="fileSize">0 MB</div>
+        </div>
+        <div class="file-remove" onclick="removeFile()">✕</div>
+      </div>
+
+      <div class="progress-section" id="progressSection">
+        <div class="progress-label">
+          <span id="progressText">Analyzing meeting...</span>
+          <span id="progressPct">0%</span>
+        </div>
+        <div class="progress-bar-track"><div class="progress-bar-fill" id="progressBar"></div></div>
+        <div class="progress-steps">
+          <div class="progress-step" id="step1"><div class="step-dot"></div> Uploading file</div>
+          <div class="progress-step" id="step2"><div class="step-dot"></div> Transcribing audio</div>
+          <div class="progress-step" id="step3"><div class="step-dot"></div> Analyzing speakers</div>
+          <div class="progress-step" id="step4"><div class="step-dot"></div> Extracting insights</div>
+          <div class="progress-step" id="step5"><div class="step-dot"></div> Generating report</div>
+        </div>
+      </div>
+
+      <button class="analyze-btn" id="analyzeBtn" onclick="startAnalysis()" disabled>
+        <div class="btn-spinner"></div>
+        <span class="btn-text">🔬 Analyze Meeting</span>
+      </button>
+    </div>
+
+    <!-- Results Section -->
+    <div class="results" id="results">
+      <div class="results-header">
+        <div class="results-title">📊 Meeting Report</div>
+        <div class="results-actions">
+          <button class="btn-secondary" onclick="exportPDF()">📄 Export PDF</button>
+          <button class="btn-secondary" onclick="downloadReport()">📥 Download TXT</button>
+          <button class="btn-secondary" onclick="openChatPanel()">💬 Chat with AI</button>
+          <button class="btn-secondary" onclick="resetApp()">🔄 New Analysis</button>
+        </div>
+      </div>
+
+      <div class="stats-grid">
+        <div class="stat-card">
+          <div class="stat-label">Meeting Duration</div>
+          <div class="stat-value purple" id="statDuration">--</div>
+          <div class="stat-sub">Total time</div>
+        </div>
+        <div class="stat-card green">
+          <div class="stat-label">Productive Time</div>
+          <div class="stat-value green" id="statProductive">--</div>
+          <div class="stat-sub">On-topic discussion</div>
+        </div>
+        <div class="stat-card cyan">
+          <div class="stat-label">Participants</div>
+          <div class="stat-value cyan" id="statParticipants">--</div>
+          <div class="stat-sub">Unique speakers</div>
+        </div>
+        <div class="stat-card amber">
+          <div class="stat-label">Action Items</div>
+          <div class="stat-value amber" id="statActions">--</div>
+          <div class="stat-sub">Tasks identified</div>
+        </div>
+      </div>
+
+      <div class="main-grid">
+        <div style="display:flex;flex-direction:column;gap:24px;">
+          <div class="card">
+            <div class="card-header">
+              <div class="card-title">
+                <div class="card-title-icon" style="background:rgba(139,92,246,0.15);">🏆</div>
+                Meeting Health Score
+              </div>
+            </div>
+            <div class="score-display">
+              <div class="score-circle-wrap">
+                <svg class="score-svg" viewBox="0 0 140 140">
+                  <defs>
+                    <linearGradient id="scoreGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                      <stop offset="0%" style="stop-color:#8b5cf6" />
+                      <stop offset="100%" style="stop-color:#06b6d4" />
+                    </linearGradient>
+                  </defs>
+                  <circle class="score-track" cx="70" cy="70" r="60" />
+                  <circle class="score-fill" id="scoreCircle" cx="70" cy="70" r="60" />
+                </svg>
+                <div class="score-number"><span id="scoreNum">--</span><small>/100</small></div>
+              </div>
+              <div class="score-details">
+                <div class="score-label" id="scoreLabel">Ready to analyze</div>
+                <div class="score-desc" id="scoreDesc">Upload a meeting recording to get your meeting health score.</div>
+                <div class="score-tags" id="scoreTags"></div>
+              </div>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="card-header">
+              <div class="card-title">
+                <div class="card-title-icon" style="background:rgba(6,182,212,0.15);">📅</div>
+                Meeting Timeline
+              </div>
+            </div>
+            <div class="timeline" id="timeline"><div class="empty-state"><div class="empty-state-text">Timeline will appear after analysis</div></div></div>
+          </div>
+
+          <div class="card">
+            <div class="card-header">
+              <div class="card-title">
+                <div class="card-title-icon" style="background:rgba(16,185,129,0.15);">📝</div>
+                Full Transcribed Speech
+              </div>
+              <button class="copy-btn" id="transcriptCopyBtn" onclick="copyTranscript()" style="display:none;" title="Copy entire transcript">
+                📋 Copy
+              </button>
+            </div>
+            <div class="transcript-box" id="transcriptBox"><div class="empty-state"><div class="empty-state-text">Transcript will appear after analysis</div></div></div>
+          </div>
+        </div>
+
+        <div style="display:flex;flex-direction:column;gap:24px;">
+          <div class="card">
+            <div class="card-header">
+              <div class="card-title">
+                <div class="card-title-icon" style="background:rgba(6,182,212,0.15);">🎤</div>
+                Speaker Breakdown
+              </div>
+            </div>
+            <div class="speaker-list" id="speakerList"><div class="empty-state"><div class="empty-state-text">Speaker data will appear after analysis</div></div></div>
+          </div>
+
+          <div class="card">
+            <div class="card-header">
+              <div class="card-title">
+                <div class="card-title-icon" style="background:rgba(245,158,11,0.15);">⚡</div>
+                Key Decisions & Takeaways
+              </div>
+            </div>
+            <div class="decisions-list" id="decisionsList"><div class="empty-state"><div class="empty-state-text">Decisions will appear after analysis</div></div></div>
+          </div>
+
+          <div class="card">
+            <div class="card-header">
+              <div class="card-title">
+                <div class="card-title-icon" style="background:rgba(16,185,129,0.15);">💭</div>
+                Meeting Sentiment
+              </div>
+            </div>
+            <div class="sentiment-grid" id="sentimentGrid">
+              <div class="sentiment-item"><div class="sentiment-emoji">😊</div><div class="sentiment-label">Positive</div><div class="sentiment-percent" style="color:var(--accent3)">--</div></div>
+              <div class="sentiment-item"><div class="sentiment-emoji">😐</div><div class="sentiment-label">Neutral</div><div class="sentiment-percent" style="color:var(--text-secondary)">--</div></div>
+              <div class="sentiment-item"><div class="sentiment-emoji">😤</div><div class="sentiment-label">Tense</div><div class="sentiment-percent" style="color:var(--danger)">--</div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card" style="margin-bottom:24px;">
+        <div class="card-header">
+          <div class="card-title">
+            <div class="card-title-icon" style="background:rgba(239,68,68,0.15);">✅</div>
+            Action Items
+          </div>
+          <div id="actionCount" style="font-size:13px;color:var(--text-muted);">0 tasks</div>
+        </div>
+        <div class="action-items" id="actionItems"><div class="empty-state"><div class="empty-state-text">Action items will appear after analysis</div></div></div>
+      </div>
+
+      <!-- AI Chat Panel -->
+      <div class="chat-panel" id="chatPanel">
+        <div class="chat-header">
+          <div class="chat-header-left">
+            <div class="chat-ai-avatar">🤖</div>
+            <div class="chat-ai-info">
+              <div class="chat-ai-name">MeetingAutopsy AI</div>
+              <div class="chat-ai-sub">Ask anything about your meeting in Hindi or English</div>
+            </div>
+          </div>
+          <div class="chat-close-btn" onclick="closeChatPanel()">✕</div>
+        </div>
+        <div class="chat-messages" id="chatMessages"></div>
+        <div class="chat-suggestions" id="chatSuggestions">
+          <span class="chat-suggestion" onclick="sendSuggestion(this)">📋 Summarize key points</span>
+          <span class="chat-suggestion" onclick="sendSuggestion(this)">🎯 What were the main decisions?</span>
+          <span class="chat-suggestion" onclick="sendSuggestion(this)">⚡ Who should follow up on action items?</span>
+          <span class="chat-suggestion" onclick="sendSuggestion(this)">😊 What was the overall mood?</span>
+          <span class="chat-suggestion" onclick="sendSuggestion(this)">💡 Speaker ne AI ke baare me kya bola?</span>
+        </div>
+        <div class="chat-input-area">
+          <div class="chat-input-wrap">
+            <textarea class="chat-input" id="chatInput" placeholder="Ask about your meeting..." rows="1"
+              onkeydown="chatKeyDown(event)" oninput="autoResize(this)"></textarea>
+            <button class="chat-send-btn" id="chatSendBtn" onclick="sendChatMessage()" title="Send">➤</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+</div>
+
+<!-- API Key Modal -->
+<div class="modal-overlay" id="modalOverlay" onclick="closeModalOutside(event)">
+  <div class="modal">
+    <div class="modal-icon">⚡</div>
+    <div class="modal-title">AI Engine Settings</div>
+    <div class="modal-desc">MeetingAutopsy includes a <strong>Dedicated Python Speech AI Engine</strong> that transcribes actual audio with &gt;85% accuracy locally. You can also optionally connect Google Gemini API for cloud processing.</div>
+    <input type="password" class="modal-input" id="apiKeyInput" placeholder="Enter Gemini API key (optional)..." />
+    <br/>
+    <a href="https://aistudio.google.com/app/apikey" target="_blank" class="modal-link">🔗 Get your free API key from Google AI Studio</a>
+    <br/><br/>
+    <div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap;">
+      <button class="modal-btn" onclick="saveApiKey()">Save & Connect Cloud</button>
+      <button class="modal-btn" style="background:rgba(255,255,255,0.08);border:1px solid var(--border);" onclick="useLocalAiOnly()">Use Built-in Local AI</button>
+    </div>
+  </div>
+</div>
+
+<!-- Toast -->
+<div class="toast" id="toast">
+  <span class="toast-icon" id="toastIcon">✅</span>
+  <span id="toastText">Success!</span>
+</div>
+
+<!-- Floating Chat Button -->
+<button class="fab-chat" id="fabChat" onclick="openChatPanel()" title="Chat with AI">
+  💬
+  <span class="fab-badge" id="fabBadge" style="display:none"></span>
+</button>
+
+<script src="app.js"></script>
+</body>
+</html>

@@ -1,338 +1,10 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="dark">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>MeetingAutopsy — AI Meeting Intelligence</title>
-  <meta name="description" content="AI-powered meeting analysis tool. Upload your meeting recording and get instant insights, action items, and meeting score." />
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
-  <style>
-    :root {
-      --bg-primary: #060612;
-      --bg-secondary: #0d0d1f;
-      --bg-card: rgba(255, 255, 255, 0.04);
-      --bg-card-hover: rgba(255, 255, 255, 0.07);
-      --border: rgba(255, 255, 255, 0.08);
-      --border-active: rgba(139, 92, 246, 0.5);
-      --text-primary: #f1f0ff;
-      --text-secondary: #9991cc;
-      --text-muted: #4a4472;
-      --accent: #8b5cf6;
-      --accent-glow: rgba(139, 92, 246, 0.3);
-      --accent2: #06b6d4;
-      --accent3: #10b981;
-      --accent4: #f59e0b;
-      --danger: #ef4444;
-      --gradient-1: linear-gradient(135deg, #8b5cf6, #6366f1);
-      --gradient-2: linear-gradient(135deg, #06b6d4, #0ea5e9);
-      --gradient-3: linear-gradient(135deg, #10b981, #059669);
-      --shadow-glow: 0 0 40px rgba(139, 92, 246, 0.15);
-    }
-
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-
-    body {
-      font-family: 'Inter', sans-serif;
-      background: var(--bg-primary);
-      color: var(--text-primary);
-      min-height: 100vh;
-      overflow-x: hidden;
-    }
-
-    .bg-orbs { position: fixed; inset: 0; pointer-events: none; z-index: 0; overflow: hidden; }
-    .orb { position: absolute; border-radius: 50%; filter: blur(80px); opacity: 0.15; animation: floatOrb 20s infinite ease-in-out; }
-    .orb-1 { width: 600px; height: 600px; background: #8b5cf6; top: -200px; left: -100px; animation-delay: 0s; }
-    .orb-2 { width: 500px; height: 500px; background: #06b6d4; bottom: -150px; right: -100px; animation-delay: -7s; }
-    .orb-3 { width: 400px; height: 400px; background: #6366f1; top: 40%; left: 40%; animation-delay: -14s; }
-
-    @keyframes floatOrb {
-      0%, 100% { transform: translate(0, 0) scale(1); }
-      33% { transform: translate(30px, -30px) scale(1.05); }
-      66% { transform: translate(-20px, 20px) scale(0.95); }
-    }
-
-    .app { position: relative; z-index: 1; }
-
-    header {
-      display: flex; align-items: center; justify-content: space-between;
-      padding: 20px 40px; border-bottom: 1px solid var(--border);
-      backdrop-filter: blur(20px); background: rgba(6, 6, 18, 0.8);
-      position: sticky; top: 0; z-index: 100;
-    }
-
-    .logo { display: flex; align-items: center; gap: 12px; }
-    .logo-icon {
-      width: 38px; height: 38px; background: var(--gradient-1); border-radius: 10px;
-      display: flex; align-items: center; justify-content: center; font-size: 18px;
-      box-shadow: 0 0 20px var(--accent-glow);
-    }
-    .logo-text {
-      font-size: 20px; font-weight: 800; letter-spacing: -0.5px;
-      background: linear-gradient(135deg, #c4b5fd, #818cf8);
-      -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
-    }
-    .logo-badge {
-      font-size: 10px; font-weight: 600; color: var(--accent);
-      background: rgba(139, 92, 246, 0.15); border: 1px solid rgba(139, 92, 246, 0.3);
-      padding: 2px 8px; border-radius: 20px; letter-spacing: 0.5px;
-    }
-
-    .api-key-btn {
-      display: flex; align-items: center; gap: 8px; padding: 8px 16px;
-      background: var(--bg-card); border: 1px solid var(--border); border-radius: 10px;
-      color: var(--text-secondary); font-size: 13px; font-family: 'Inter', sans-serif;
-      cursor: pointer; transition: all 0.2s;
-    }
-    .api-key-btn:hover { background: var(--bg-card-hover); border-color: var(--accent); color: var(--text-primary); }
-    .api-key-btn.connected { color: var(--accent3); border-color: rgba(16, 185, 129, 0.3); }
-    .api-key-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--text-muted); transition: background 0.3s; }
-    .api-key-btn.connected .api-key-dot { background: var(--accent3); box-shadow: 0 0 8px var(--accent3); }
-
-    main { padding: 40px; max-width: 1400px; margin: 0 auto; }
-
-    .hero { text-align: center; padding: 60px 20px 40px; }
-    .hero-eyebrow {
-      display: inline-flex; align-items: center; gap: 8px; font-size: 12px; font-weight: 600;
-      letter-spacing: 2px; text-transform: uppercase; color: var(--accent);
-      background: rgba(139, 92, 246, 0.1); border: 1px solid rgba(139, 92, 246, 0.2);
-      padding: 6px 16px; border-radius: 20px; margin-bottom: 24px;
-    }
-    .hero h1 { font-size: 56px; font-weight: 900; line-height: 1.1; letter-spacing: -2px; margin-bottom: 16px; }
-    .hero h1 span {
-      background: linear-gradient(135deg, #a78bfa, #818cf8, #38bdf8);
-      -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
-    }
-    .hero p { font-size: 18px; color: var(--text-secondary); max-width: 500px; margin: 0 auto 40px; line-height: 1.6; }
-
-    .upload-zone {
-      border: 2px dashed var(--border); border-radius: 24px; padding: 60px 40px;
-      text-align: center; cursor: pointer; transition: all 0.3s ease;
-      background: var(--bg-card); position: relative; overflow: hidden;
-    }
-    .upload-zone::before {
-      content: ''; position: absolute; inset: 0;
-      background: radial-gradient(ellipse at center, rgba(139, 92, 246, 0.05) 0%, transparent 70%);
-      opacity: 0; transition: opacity 0.3s;
-    }
-    .upload-zone:hover { border-color: var(--accent); box-shadow: var(--shadow-glow); }
-    .upload-zone:hover::before { opacity: 1; }
-    .upload-zone.drag-over { border-color: var(--accent); background: rgba(139, 92, 246, 0.08); transform: scale(1.01); box-shadow: 0 0 60px rgba(139, 92, 246, 0.2); }
-    .upload-zone.has-file { border-color: var(--accent3); border-style: solid; background: rgba(16, 185, 129, 0.05); }
-
-    .upload-icon {
-      width: 72px; height: 72px; margin: 0 auto 20px;
-      background: linear-gradient(135deg, rgba(139, 92, 246, 0.2), rgba(99, 102, 241, 0.2));
-      border: 1px solid rgba(139, 92, 246, 0.3); border-radius: 20px;
-      display: flex; align-items: center; justify-content: center; font-size: 32px; transition: all 0.3s;
-    }
-    .upload-zone:hover .upload-icon { transform: scale(1.1); box-shadow: 0 0 30px rgba(139, 92, 246, 0.3); }
-    .upload-title { font-size: 22px; font-weight: 700; margin-bottom: 8px; }
-    .upload-subtitle { font-size: 14px; color: var(--text-secondary); margin-bottom: 20px; }
-    .upload-formats { display: flex; gap: 8px; justify-content: center; flex-wrap: wrap; }
-    .format-badge {
-      font-size: 11px; font-weight: 600; font-family: 'JetBrains Mono', monospace;
-      padding: 4px 10px; border-radius: 6px;
-      background: rgba(255, 255, 255, 0.05); border: 1px solid var(--border); color: var(--text-secondary);
-    }
-
-    .file-preview {
-      display: none; align-items: center; gap: 16px;
-      background: rgba(16, 185, 129, 0.08); border: 1px solid rgba(16, 185, 129, 0.2);
-      border-radius: 16px; padding: 16px 20px; margin-top: 20px;
-    }
-    .file-preview.visible { display: flex; }
-    .file-icon { font-size: 28px; }
-    .file-info { text-align: left; flex: 1; }
-    .file-name { font-size: 14px; font-weight: 600; color: var(--text-primary); }
-    .file-size { font-size: 12px; color: var(--text-secondary); margin-top: 2px; }
-    .file-remove {
-      width: 32px; height: 32px; background: rgba(239, 68, 68, 0.1);
-      border: 1px solid rgba(239, 68, 68, 0.2); border-radius: 8px;
-      display: flex; align-items: center; justify-content: center;
-      cursor: pointer; font-size: 16px; color: var(--danger); transition: all 0.2s;
-    }
-    .file-remove:hover { background: rgba(239, 68, 68, 0.2); }
-
-    .analyze-btn {
-      width: 100%; padding: 18px; background: var(--gradient-1); border: none; border-radius: 16px;
-      color: white; font-size: 16px; font-weight: 700; font-family: 'Inter', sans-serif;
-      cursor: pointer; transition: all 0.3s; display: flex; align-items: center; justify-content: center;
-      gap: 10px; box-shadow: 0 0 30px rgba(139, 92, 246, 0.3); margin-top: 20px; letter-spacing: -0.3px;
-    }
-    .analyze-btn:hover { transform: translateY(-2px); box-shadow: 0 0 50px rgba(139, 92, 246, 0.5); }
-    .analyze-btn:active { transform: translateY(0); }
-    .analyze-btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
-    .btn-spinner {
-      width: 18px; height: 18px; border: 2px solid rgba(255,255,255,0.3);
-      border-top-color: white; border-radius: 50%; animation: spin 0.8s linear infinite; display: none;
-    }
-    .analyze-btn.loading .btn-spinner { display: block; }
-    .analyze-btn.loading .btn-text { display: none; }
-
-    @keyframes spin { to { transform: rotate(360deg); } }
-
-    .progress-section { display: none; margin: 20px 0; }
-    .progress-section.visible { display: block; }
-    .progress-label { display: flex; justify-content: space-between; font-size: 13px; color: var(--text-secondary); margin-bottom: 10px; }
-    .progress-label span { color: var(--accent); font-weight: 600; }
-    .progress-bar-track { height: 6px; background: var(--bg-card); border-radius: 10px; overflow: hidden; }
-    .progress-bar-fill { height: 100%; background: var(--gradient-1); border-radius: 10px; width: 0%; transition: width 0.5s ease; box-shadow: 0 0 10px var(--accent-glow); }
-    .progress-steps { display: flex; gap: 12px; margin-top: 16px; flex-wrap: wrap; }
-    .progress-step { display: flex; align-items: center; gap: 6px; font-size: 12px; color: var(--text-muted); transition: color 0.3s; }
-    .progress-step.active { color: var(--accent); }
-    .progress-step.done { color: var(--accent3); }
-    .step-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--text-muted); transition: all 0.3s; }
-    .progress-step.active .step-dot { background: var(--accent); box-shadow: 0 0 8px var(--accent); animation: pulse 1s infinite; }
-    .progress-step.done .step-dot { background: var(--accent3); }
-
-    @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.4; } }
-
-    .results { display: none; }
-    .results.visible { display: block; animation: fadeInUp 0.6s ease; }
-
-    @keyframes fadeInUp { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
-
-    .results-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 32px; }
-    .results-title { font-size: 28px; font-weight: 800; letter-spacing: -0.5px; }
-    .results-actions { display: flex; gap: 10px; }
-
-    .btn-secondary {
-      display: flex; align-items: center; gap: 8px; padding: 10px 18px;
-      background: var(--bg-card); border: 1px solid var(--border); border-radius: 12px;
-      color: var(--text-secondary); font-size: 13px; font-weight: 500;
-      font-family: 'Inter', sans-serif; cursor: pointer; transition: all 0.2s;
-    }
-    .btn-secondary:hover { background: var(--bg-card-hover); color: var(--text-primary); border-color: var(--accent); }
-
-    .stats-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 24px; }
-    .stat-card {
-      background: var(--bg-card); border: 1px solid var(--border); border-radius: 20px;
-      padding: 24px; transition: all 0.3s; position: relative; overflow: hidden;
-    }
-    .stat-card::after {
-      content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px;
-      background: var(--gradient-1); opacity: 0; transition: opacity 0.3s;
-    }
-    .stat-card:hover { background: var(--bg-card-hover); transform: translateY(-2px); box-shadow: var(--shadow-glow); }
-    .stat-card:hover::after { opacity: 1; }
-    .stat-card.green::after { background: var(--gradient-3); }
-    .stat-card.cyan::after { background: var(--gradient-2); }
-    .stat-card.amber::after { background: linear-gradient(135deg, #f59e0b, #d97706); }
-    .stat-label { font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; color: var(--text-muted); margin-bottom: 12px; }
-    .stat-value { font-size: 36px; font-weight: 900; letter-spacing: -1.5px; line-height: 1; margin-bottom: 4px; }
-    .stat-value.purple { color: var(--accent); }
-    .stat-value.green { color: var(--accent3); }
-    .stat-value.cyan { color: var(--accent2); }
-    .stat-value.amber { color: var(--accent4); }
-    .stat-sub { font-size: 12px; color: var(--text-muted); }
-
-    .main-grid { display: grid; grid-template-columns: 1fr 380px; gap: 24px; margin-bottom: 24px; }
-    .card { background: var(--bg-card); border: 1px solid var(--border); border-radius: 20px; padding: 28px; transition: all 0.3s; }
-    .card:hover { background: var(--bg-card-hover); }
-    .card-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 24px; }
-    .card-title { font-size: 16px; font-weight: 700; display: flex; align-items: center; gap: 8px; }
-    .card-title-icon { width: 32px; height: 32px; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 16px; }
-
-    .score-display { display: flex; align-items: center; gap: 32px; }
-    .score-circle-wrap { position: relative; width: 140px; height: 140px; flex-shrink: 0; }
-    .score-svg { width: 140px; height: 140px; transform: rotate(-90deg); }
-    .score-track { fill: none; stroke: rgba(255,255,255,0.06); stroke-width: 10; }
-    .score-fill { fill: none; stroke: url(#scoreGradient); stroke-width: 10; stroke-linecap: round; stroke-dasharray: 377; stroke-dashoffset: 377; transition: stroke-dashoffset 1.5s cubic-bezier(0.34, 1.56, 0.64, 1); }
-    .score-number { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; font-size: 34px; font-weight: 900; letter-spacing: -1px; }
-    .score-number small { font-size: 12px; font-weight: 500; color: var(--text-muted); letter-spacing: 0; }
-    .score-details { flex: 1; }
-    .score-label { font-size: 20px; font-weight: 800; margin-bottom: 8px; }
-    .score-desc { font-size: 14px; color: var(--text-secondary); line-height: 1.6; margin-bottom: 16px; }
-    .score-tags { display: flex; gap: 8px; flex-wrap: wrap; }
-    .score-tag { font-size: 11px; font-weight: 600; padding: 4px 10px; border-radius: 20px; }
-    .score-tag.good { background: rgba(16, 185, 129, 0.15); color: var(--accent3); border: 1px solid rgba(16, 185, 129, 0.2); }
-    .score-tag.bad { background: rgba(239, 68, 68, 0.12); color: #f87171; border: 1px solid rgba(239, 68, 68, 0.2); }
-    .score-tag.warn { background: rgba(245, 158, 11, 0.12); color: var(--accent4); border: 1px solid rgba(245, 158, 11, 0.2); }
-
-    .speaker-list { display: flex; flex-direction: column; gap: 14px; }
-    .speaker-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; }
-    .speaker-name { display: flex; align-items: center; gap: 10px; font-size: 13px; font-weight: 600; }
-    .speaker-dot { width: 10px; height: 10px; border-radius: 50%; }
-    .speaker-time { font-size: 12px; color: var(--text-secondary); font-family: 'JetBrains Mono', monospace; }
-    .speaker-bar-track { height: 6px; background: rgba(255,255,255,0.06); border-radius: 10px; overflow: hidden; }
-    .speaker-bar-fill { height: 100%; border-radius: 10px; width: 0%; transition: width 1.2s cubic-bezier(0.34, 1.56, 0.64, 1); }
-
-    .timeline-item { display: flex; gap: 16px; padding-bottom: 24px; position: relative; }
-    .timeline-item:not(:last-child)::before { content: ''; position: absolute; left: 17px; top: 36px; bottom: 0; width: 2px; background: var(--border); }
-    .timeline-dot { width: 36px; height: 36px; border-radius: 10px; flex-shrink: 0; display: flex; align-items: center; justify-content: center; font-size: 16px; background: var(--bg-card); border: 1px solid var(--border); }
-    .timeline-content { flex: 1; padding-top: 4px; }
-    .timeline-time { font-size: 11px; color: var(--text-muted); font-family: 'JetBrains Mono', monospace; margin-bottom: 4px; }
-    .timeline-text { font-size: 13px; color: var(--text-secondary); line-height: 1.6; }
-    .timeline-highlight { color: var(--text-primary); font-weight: 600; }
-
-    .action-items { display: flex; flex-direction: column; gap: 12px; }
-    .action-item {
-      display: flex; align-items: flex-start; gap: 14px; padding: 14px 16px;
-      background: rgba(255,255,255,0.03); border: 1px solid var(--border);
-      border-radius: 14px; transition: all 0.2s; cursor: pointer;
-    }
-    .action-item:hover { background: rgba(255,255,255,0.06); border-color: var(--accent); }
-    .action-checkbox { width: 20px; height: 20px; border: 2px solid var(--border); border-radius: 6px; flex-shrink: 0; margin-top: 2px; display: flex; align-items: center; justify-content: center; transition: all 0.2s; }
-    .action-item.checked .action-checkbox { background: var(--accent3); border-color: var(--accent3); }
-    .action-item.checked .action-checkbox::after { content: '✓'; font-size: 12px; color: white; }
-    .action-item.checked .action-text { text-decoration: line-through; color: var(--text-muted); }
-    .action-info { flex: 1; }
-    .action-text { font-size: 13px; color: var(--text-primary); line-height: 1.5; margin-bottom: 6px; }
-    .action-meta { display: flex; gap: 8px; flex-wrap: wrap; }
-    .action-tag { font-size: 10px; font-weight: 600; padding: 2px 8px; border-radius: 20px; text-transform: uppercase; letter-spacing: 0.5px; }
-    .action-tag.owner { background: rgba(139, 92, 246, 0.15); color: #c4b5fd; border: 1px solid rgba(139, 92, 246, 0.2); }
-    .action-tag.deadline { background: rgba(245, 158, 11, 0.12); color: var(--accent4); border: 1px solid rgba(245, 158, 11, 0.2); }
-    .action-tag.priority { background: rgba(239, 68, 68, 0.12); color: #f87171; border: 1px solid rgba(239, 68, 68, 0.2); }
-
-    .sentiment-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; }
-    .sentiment-item { text-align: center; padding: 20px 12px; background: rgba(255,255,255,0.03); border: 1px solid var(--border); border-radius: 14px; }
-    .sentiment-emoji { font-size: 28px; margin-bottom: 8px; }
-    .sentiment-label { font-size: 11px; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 6px; }
-    .sentiment-percent { font-size: 22px; font-weight: 800; }
-
-    .decisions-list { display: flex; flex-direction: column; gap: 10px; }
-    .decision-item { display: flex; align-items: flex-start; gap: 12px; padding: 14px 16px; background: rgba(6, 182, 212, 0.05); border: 1px solid rgba(6, 182, 212, 0.15); border-radius: 12px; }
-    .decision-icon { font-size: 16px; margin-top: 2px; flex-shrink: 0; }
-    .decision-text { font-size: 13px; color: var(--text-secondary); line-height: 1.6; }
-
-    .transcript-box { background: rgba(0,0,0,0.3); border: 1px solid var(--border); border-radius: 14px; padding: 20px; max-height: 300px; overflow-y: auto; font-size: 13px; line-height: 1.8; color: var(--text-secondary); }
-    .transcript-box::-webkit-scrollbar { width: 4px; }
-    .transcript-box::-webkit-scrollbar-thumb { background: var(--border); border-radius: 10px; }
-    .transcript-speaker { font-weight: 700; color: var(--accent); font-size: 11px; text-transform: uppercase; letter-spacing: 1px; }
-
-    .modal-overlay { position: fixed; inset: 0; background: rgba(0, 0, 0, 0.8); backdrop-filter: blur(10px); z-index: 1000; display: none; align-items: center; justify-content: center; }
-    .modal-overlay.open { display: flex; }
-    .modal { background: #0d0d1f; border: 1px solid rgba(139, 92, 246, 0.3); border-radius: 24px; padding: 40px; width: 460px; animation: modalIn 0.3s cubic-bezier(0.34, 1.56, 0.64, 1); box-shadow: 0 0 80px rgba(139, 92, 246, 0.2); }
-    @keyframes modalIn { from { opacity: 0; transform: scale(0.9) translateY(20px); } to { opacity: 1; transform: scale(1) translateY(0); } }
-    .modal-icon { font-size: 40px; margin-bottom: 16px; }
-    .modal-title { font-size: 22px; font-weight: 800; margin-bottom: 8px; }
-    .modal-desc { font-size: 14px; color: var(--text-secondary); line-height: 1.6; margin-bottom: 24px; }
-    .modal-input { width: 100%; padding: 14px 16px; background: rgba(255,255,255,0.04); border: 1px solid var(--border); border-radius: 12px; color: var(--text-primary); font-size: 14px; font-family: 'JetBrains Mono', monospace; outline: none; transition: all 0.2s; margin-bottom: 16px; }
-    .modal-input:focus { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.1); }
-    .modal-input::placeholder { color: var(--text-muted); }
-    .modal-link { display: inline-flex; align-items: center; gap: 6px; font-size: 12px; color: var(--accent); text-decoration: none; margin-bottom: 24px; }
-    .modal-link:hover { text-decoration: underline; }
-    .modal-btn { width: 100%; padding: 14px; background: var(--gradient-1); border: none; border-radius: 12px; color: white; font-size: 15px; font-weight: 700; font-family: 'Inter', sans-serif; cursor: pointer; transition: all 0.2s; }
-    .modal-btn:hover { opacity: 0.9; transform: translateY(-1px); }
-
-    .toast { position: fixed; bottom: 32px; right: 32px; background: #1a1a2e; border: 1px solid var(--border); border-radius: 14px; padding: 16px 20px; display: flex; align-items: center; gap: 12px; font-size: 14px; font-weight: 500; box-shadow: 0 20px 60px rgba(0,0,0,0.5); z-index: 2000; transform: translateY(100px); opacity: 0; transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1); }
-    .toast.show { transform: translateY(0); opacity: 1; }
-    .toast.success { border-color: rgba(16, 185, 129, 0.3); }
-    .toast.error { border-color: rgba(239, 68, 68, 0.3); }
-    .toast-icon { font-size: 20px; }
-
-    .empty-state { text-align: center; padding: 40px; color: var(--text-muted); }
-    .empty-state-icon { font-size: 40px; margin-bottom: 12px; opacity: 0.5; }
-    .empty-state-text { font-size: 14px; }
-
-    @media (max-width: 1100px) { .main-grid { grid-template-columns: 1fr; } .stats-grid { grid-template-columns: repeat(2, 1fr); } }
-    @media (max-width: 600px) { header { padding: 16px 20px; } main { padding: 20px; } .hero h1 { font-size: 36px; } .stats-grid { grid-template-columns: repeat(2, 1fr); } }
-    ::-webkit-scrollbar { width: 6px; }
-    ::-webkit-scrollbar-track { background: var(--bg-primary); }
-    ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 10px; }
-    input[type="file"] { display: none; }
-  </style>
+  <title>MeetingAutopsy — AI-Powered Meeting Intelligence</title>
+  <link rel="stylesheet" href="style.css" />
 </head>
 <body>
 
@@ -349,17 +21,20 @@
       <div class="logo-text">MeetingAutopsy</div>
       <div class="logo-badge">AI POWERED</div>
     </div>
-    <button class="api-key-btn" id="apiKeyBtn" onclick="openModal()">
-      <div class="api-key-dot"></div>
-      <span id="apiKeyBtnText">Set API Key</span>
-    </button>
+    <div class="header-right">
+      <button class="theme-toggle" id="themeToggle" onclick="toggleTheme()" title="Toggle theme">🌙</button>
+      <button class="api-key-btn" id="apiKeyBtn" onclick="openModal()">
+        <div class="api-key-dot"></div>
+        <span id="apiKeyBtnText">Local AI Engine</span>
+      </button>
+    </div>
   </header>
 
   <main>
     <div class="hero">
-      <div class="hero-eyebrow">✨ Powered by Gemini AI</div>
+      <div class="hero-eyebrow" id="engineBadge">⚡ Python Speech AI & Gemini Hybrid Engine</div>
       <h1>Dissect Your<br /><span>Meeting's DNA</span></h1>
-      <p>Upload any meeting recording. Get instant AI-powered insights, action items, and a meeting health score in seconds.</p>
+      <p>Upload any meeting recording. Get instant, high-accuracy AI insights, speaker speech transcription, action items, and a meeting health score in seconds.</p>
     </div>
 
     <div class="upload-section">
@@ -368,7 +43,7 @@
            ondrop="handleDrop(event)" onclick="document.getElementById('fileInput').click()">
         <div class="upload-icon" id="uploadIcon">🎙️</div>
         <div class="upload-title" id="uploadTitle">Drop your meeting recording here</div>
-        <div class="upload-subtitle" id="uploadSubtitle">or click to browse files</div>
+        <div class="upload-subtitle" id="uploadSubtitle">or click to browse video / audio files</div>
         <div class="upload-formats">
           <span class="format-badge">.mp3</span>
           <span class="format-badge">.mp4</span>
@@ -406,16 +81,18 @@
 
       <button class="analyze-btn" id="analyzeBtn" onclick="startAnalysis()" disabled>
         <div class="btn-spinner"></div>
-        <span class="btn-text">🔬 &nbsp;Analyze Meeting</span>
+        <span class="btn-text">🔬 Analyze Meeting</span>
       </button>
     </div>
 
-    <!-- Results -->
+    <!-- Results Section -->
     <div class="results" id="results">
       <div class="results-header">
         <div class="results-title">📊 Meeting Report</div>
         <div class="results-actions">
-          <button class="btn-secondary" onclick="downloadReport()">📥 Download Report</button>
+          <button class="btn-secondary" onclick="exportPDF()">📄 Export PDF</button>
+          <button class="btn-secondary" onclick="downloadReport()">📥 Download TXT</button>
+          <button class="btn-secondary" onclick="openChatPanel()">💬 Chat with AI</button>
           <button class="btn-secondary" onclick="resetApp()">🔄 New Analysis</button>
         </div>
       </div>
@@ -481,17 +158,20 @@
                 Meeting Timeline
               </div>
             </div>
-            <div id="timeline"></div>
+            <div class="timeline" id="timeline"><div class="empty-state"><div class="empty-state-text">Timeline will appear after analysis</div></div></div>
           </div>
 
           <div class="card">
             <div class="card-header">
               <div class="card-title">
-                <div class="card-title-icon" style="background:rgba(99,102,241,0.15);">📝</div>
-                Full Transcript
+                <div class="card-title-icon" style="background:rgba(16,185,129,0.15);">📝</div>
+                Full Transcribed Speech
               </div>
+              <button class="copy-btn" id="transcriptCopyBtn" onclick="copyTranscript()" style="display:none;" title="Copy entire transcript">
+                📋 Copy
+              </button>
             </div>
-            <div class="transcript-box" id="transcriptBox"><div class="empty-state"><div class="empty-state-text">Transcript will appear here after analysis</div></div></div>
+            <div class="transcript-box" id="transcriptBox"><div class="empty-state"><div class="empty-state-text">Transcript will appear after analysis</div></div></div>
           </div>
         </div>
 
@@ -499,11 +179,21 @@
           <div class="card">
             <div class="card-header">
               <div class="card-title">
-                <div class="card-title-icon" style="background:rgba(245,158,11,0.15);">🎤</div>
+                <div class="card-title-icon" style="background:rgba(6,182,212,0.15);">🎤</div>
                 Speaker Breakdown
               </div>
             </div>
-            <div class="speaker-list" id="speakerList"><div class="empty-state"><div class="empty-state-icon">🎤</div><div class="empty-state-text">Speakers will appear after analysis</div></div></div>
+            <div class="speaker-list" id="speakerList"><div class="empty-state"><div class="empty-state-text">Speaker data will appear after analysis</div></div></div>
+          </div>
+
+          <div class="card">
+            <div class="card-header">
+              <div class="card-title">
+                <div class="card-title-icon" style="background:rgba(245,158,11,0.15);">⚡</div>
+                Key Decisions & Takeaways
+              </div>
+            </div>
+            <div class="decisions-list" id="decisionsList"><div class="empty-state"><div class="empty-state-text">Decisions will appear after analysis</div></div></div>
           </div>
 
           <div class="card">
@@ -514,20 +204,10 @@
               </div>
             </div>
             <div class="sentiment-grid" id="sentimentGrid">
-              <div class="sentiment-item"><div class="sentiment-emoji">😊</div><div class="sentiment-label">Positive</div><div class="sentiment-percent">--</div></div>
-              <div class="sentiment-item"><div class="sentiment-emoji">😐</div><div class="sentiment-label">Neutral</div><div class="sentiment-percent">--</div></div>
-              <div class="sentiment-item"><div class="sentiment-emoji">😤</div><div class="sentiment-label">Tense</div><div class="sentiment-percent">--</div></div>
+              <div class="sentiment-item"><div class="sentiment-emoji">😊</div><div class="sentiment-label">Positive</div><div class="sentiment-percent" style="color:var(--accent3)">--</div></div>
+              <div class="sentiment-item"><div class="sentiment-emoji">😐</div><div class="sentiment-label">Neutral</div><div class="sentiment-percent" style="color:var(--text-secondary)">--</div></div>
+              <div class="sentiment-item"><div class="sentiment-emoji">😤</div><div class="sentiment-label">Tense</div><div class="sentiment-percent" style="color:var(--danger)">--</div></div>
             </div>
-          </div>
-
-          <div class="card">
-            <div class="card-header">
-              <div class="card-title">
-                <div class="card-title-icon" style="background:rgba(6,182,212,0.15);">⚡</div>
-                Key Decisions
-              </div>
-            </div>
-            <div class="decisions-list" id="decisionsList"><div class="empty-state"><div class="empty-state-icon">⚡</div><div class="empty-state-text">Decisions will appear after analysis</div></div></div>
           </div>
         </div>
       </div>
@@ -542,6 +222,35 @@
         </div>
         <div class="action-items" id="actionItems"><div class="empty-state"><div class="empty-state-text">Action items will appear after analysis</div></div></div>
       </div>
+
+      <!-- AI Chat Panel -->
+      <div class="chat-panel" id="chatPanel">
+        <div class="chat-header">
+          <div class="chat-header-left">
+            <div class="chat-ai-avatar">🤖</div>
+            <div class="chat-ai-info">
+              <div class="chat-ai-name">MeetingAutopsy AI</div>
+              <div class="chat-ai-sub">Ask anything about your meeting in Hindi or English</div>
+            </div>
+          </div>
+          <div class="chat-close-btn" onclick="closeChatPanel()">✕</div>
+        </div>
+        <div class="chat-messages" id="chatMessages"></div>
+        <div class="chat-suggestions" id="chatSuggestions">
+          <span class="chat-suggestion" onclick="sendSuggestion(this)">📋 Summarize key points</span>
+          <span class="chat-suggestion" onclick="sendSuggestion(this)">🎯 What were the main decisions?</span>
+          <span class="chat-suggestion" onclick="sendSuggestion(this)">⚡ Who should follow up on action items?</span>
+          <span class="chat-suggestion" onclick="sendSuggestion(this)">😊 What was the overall mood?</span>
+          <span class="chat-suggestion" onclick="sendSuggestion(this)">💡 Speaker ne AI ke baare me kya bola?</span>
+        </div>
+        <div class="chat-input-area">
+          <div class="chat-input-wrap">
+            <textarea class="chat-input" id="chatInput" placeholder="Ask about your meeting..." rows="1"
+              onkeydown="chatKeyDown(event)" oninput="autoResize(this)"></textarea>
+            <button class="chat-send-btn" id="chatSendBtn" onclick="sendChatMessage()" title="Send">➤</button>
+          </div>
+        </div>
+      </div>
     </div>
   </main>
 </div>
@@ -549,14 +258,17 @@
 <!-- API Key Modal -->
 <div class="modal-overlay" id="modalOverlay" onclick="closeModalOutside(event)">
   <div class="modal">
-    <div class="modal-icon">🔑</div>
-    <div class="modal-title">Connect Gemini AI</div>
-    <div class="modal-desc">Enter your Google Gemini API key to enable AI-powered meeting analysis. Your key is stored only in your browser — never on any server.</div>
-    <input type="password" class="modal-input" id="apiKeyInput" placeholder="AIzaSy..." />
+    <div class="modal-icon">⚡</div>
+    <div class="modal-title">AI Engine Settings</div>
+    <div class="modal-desc">MeetingAutopsy includes a <strong>Dedicated Python Speech AI Engine</strong> that transcribes actual audio with &gt;85% accuracy locally. You can also optionally connect Google Gemini API for cloud processing.</div>
+    <input type="password" class="modal-input" id="apiKeyInput" placeholder="Enter Gemini API key (optional)..." />
     <br/>
     <a href="https://aistudio.google.com/app/apikey" target="_blank" class="modal-link">🔗 Get your free API key from Google AI Studio</a>
     <br/><br/>
-    <button class="modal-btn" onclick="saveApiKey()">Connect & Enable Analysis</button>
+    <div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap;">
+      <button class="modal-btn" onclick="saveApiKey()">Save & Connect Cloud</button>
+      <button class="modal-btn" style="background:rgba(255,255,255,0.08);border:1px solid var(--border);" onclick="useLocalAiOnly()">Use Built-in Local AI</button>
+    </div>
   </div>
 </div>
 
@@ -566,269 +278,12 @@
   <span id="toastText">Success!</span>
 </div>
 
-<script>
-  let apiKey = localStorage.getItem('gemini_api_key') || '';
-  let currentFile = null;
-  let analysisData = null;
-  const SPEAKER_COLORS = ['#8b5cf6','#06b6d4','#10b981','#f59e0b','#ef4444','#ec4899','#f97316'];
+<!-- Floating Chat Button -->
+<button class="fab-chat" id="fabChat" onclick="openChatPanel()" title="Chat with AI">
+  💬
+  <span class="fab-badge" id="fabBadge" style="display:none"></span>
+</button>
 
-  window.addEventListener('load', () => { if (apiKey) updateApiKeyBtn(true); });
-
-  function updateApiKeyBtn(connected) {
-    const btn = document.getElementById('apiKeyBtn');
-    document.getElementById('apiKeyBtnText').textContent = connected ? 'API Connected' : 'Set API Key';
-    btn.classList.toggle('connected', connected);
-  }
-
-  function openModal() { document.getElementById('modalOverlay').classList.add('open'); if (apiKey) document.getElementById('apiKeyInput').value = apiKey; }
-  function closeModalOutside(e) { if (e.target === document.getElementById('modalOverlay')) document.getElementById('modalOverlay').classList.remove('open'); }
-
-  function saveApiKey() {
-    const key = document.getElementById('apiKeyInput').value.trim();
-    if (!key.startsWith('AIza') && !key.startsWith('AQ.')) { showToast('error', '❌', 'Invalid API key format'); return; }
-    apiKey = key;
-    localStorage.setItem('gemini_api_key', key);
-    document.getElementById('modalOverlay').classList.remove('open');
-    updateApiKeyBtn(true);
-    showToast('success', '✅', 'Gemini AI connected successfully!');
-    checkAnalyzeBtn();
-  }
-
-  function handleDragOver(e) { e.preventDefault(); document.getElementById('uploadZone').classList.add('drag-over'); }
-  function handleDragLeave() { document.getElementById('uploadZone').classList.remove('drag-over'); }
-  function handleDrop(e) { e.preventDefault(); document.getElementById('uploadZone').classList.remove('drag-over'); const f = e.dataTransfer.files[0]; if (f) processFile(f); }
-  function handleFileSelect(e) { const f = e.target.files[0]; if (f) processFile(f); }
-
-  function processFile(file) {
-    if (!file.type.match(/audio.*|video.*/)) { showToast('error', '❌', 'Please upload an audio or video file'); return; }
-    if (file.size > 200 * 1024 * 1024) { showToast('error', '❌', 'File size must be under 200MB'); return; }
-    currentFile = file;
-    const zone = document.getElementById('uploadZone');
-    zone.classList.add('has-file');
-    document.getElementById('uploadIcon').textContent = '✅';
-    document.getElementById('uploadTitle').textContent = 'File ready for analysis!';
-    document.getElementById('uploadSubtitle').textContent = 'Click "Analyze Meeting" to start';
-    document.getElementById('filePreview').classList.add('visible');
-    document.getElementById('previewIcon').textContent = file.type.startsWith('video') ? '🎬' : '🎵';
-    document.getElementById('fileName').textContent = file.name;
-    document.getElementById('fileSize').textContent = formatFileSize(file.size);
-    checkAnalyzeBtn();
-    showToast('success', '🎙️', 'Recording loaded!');
-  }
-
-  function removeFile() {
-    currentFile = null;
-    document.getElementById('uploadZone').classList.remove('has-file');
-    document.getElementById('uploadIcon').textContent = '🎙️';
-    document.getElementById('uploadTitle').textContent = 'Drop your meeting recording here';
-    document.getElementById('uploadSubtitle').textContent = 'or click to browse files';
-    document.getElementById('filePreview').classList.remove('visible');
-    document.getElementById('fileInput').value = '';
-    document.getElementById('analyzeBtn').disabled = true;
-  }
-
-  function formatFileSize(b) { return b > 1048576 ? (b/1048576).toFixed(1)+' MB' : (b/1024).toFixed(0)+' KB'; }
-  function checkAnalyzeBtn() { document.getElementById('analyzeBtn').disabled = !(apiKey && currentFile); }
-
-  async function startAnalysis() {
-    if (!apiKey) { openModal(); return; }
-    if (!currentFile) return;
-    const btn = document.getElementById('analyzeBtn');
-    btn.classList.add('loading'); btn.disabled = true;
-    document.getElementById('progressSection').classList.add('visible');
-    document.getElementById('results').classList.remove('visible');
-    try {
-      setProgress(10, 'Uploading file...', 'step1');
-      const b64 = await fileToBase64(currentFile);
-      setProgress(30, 'Transcribing audio...', 'step2');
-      await delay(500);
-      setProgress(55, 'Analyzing speakers...', 'step3');
-      const result = await callGeminiAPI(b64, currentFile.type);
-      setProgress(75, 'Extracting insights...', 'step4');
-      await delay(400);
-      setProgress(90, 'Generating report...', 'step5');
-      await delay(400);
-      analysisData = parseResult(result);
-      setProgress(100, 'Complete!', 'step5', true);
-      await delay(600);
-      document.getElementById('progressSection').classList.remove('visible');
-      renderResults(analysisData);
-    } catch (err) {
-      document.getElementById('progressSection').classList.remove('visible');
-      showToast('error', '❌', err.message || 'Analysis failed. Check API key.');
-    } finally {
-      btn.classList.remove('loading'); btn.disabled = false; checkAnalyzeBtn();
-    }
-  }
-
-  function fileToBase64(file) {
-    return new Promise((res, rej) => { const r = new FileReader(); r.onload = () => res(r.result.split(',')[1]); r.onerror = rej; r.readAsDataURL(file); });
-  }
-
-  async function callGeminiAPI(b64, mimeType) {
-    const mime = mimeType || 'audio/mpeg';
-    const prompt = `You are an expert meeting analyst AI. Analyze this meeting recording thoroughly.
-Return ONLY valid JSON (no markdown fences) matching this exact schema:
-{
-  "duration": "string like '45 minutes'",
-  "productive_pct": number_0_to_100,
-  "score": number_0_to_100,
-  "score_label": "string",
-  "score_desc": "2-sentence description",
-  "score_tags": [{"text":"string","type":"good|bad|warn"}],
-  "participants": number,
-  "speakers": [{"name":"string","duration":"string","percentage":number}],
-  "timeline": [{"time":"MM:SS","emoji":"string","highlight":"string","text":"string"}],
-  "action_items": [{"text":"string","owner":"string","deadline":"string","priority":"High|Medium|Low"}],
-  "decisions": ["string"],
-  "sentiment": {"positive":number,"neutral":number,"negative":number},
-  "transcript": "full transcript with Speaker N: prefix per line"
-}
-Analyze the actual audio content. Extract real names if audible. Be thorough and accurate.`;
-
-    const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        contents: [{ parts: [{ text: prompt }, { inline_data: { mime_type: mime, data: b64 } }] }],
-        generationConfig: { temperature: 0.2, responseMimeType: "application/json" }
-      })
-    });
-    if (!res.ok) {
-      const e = await res.json().catch(() => ({}));
-      throw new Error(e?.error?.message || `API Error ${res.status}`);
-    }
-    const d = await res.json();
-    const text = d?.candidates?.[0]?.content?.parts?.[0]?.text;
-    if (!text) throw new Error('No response from Gemini');
-    return text;
-  }
-
-  function parseResult(text) {
-    try { return JSON.parse(text.replace(/```json\n?/g,'').replace(/```\n?/g,'').trim()); }
-    catch { throw new Error('Could not parse AI response. Try again.'); }
-  }
-
-  function renderResults(d) {
-    document.getElementById('statDuration').textContent = d.duration || '--';
-    document.getElementById('statProductive').textContent = (d.productive_pct||0)+'%';
-    document.getElementById('statParticipants').textContent = d.participants||(d.speakers?.length||'--');
-    document.getElementById('statActions').textContent = d.action_items?.length||0;
-
-    const score = d.score||0;
-    document.getElementById('scoreNum').textContent = score;
-    document.getElementById('scoreLabel').textContent = d.score_label||getScoreLabel(score);
-    document.getElementById('scoreDesc').textContent = d.score_desc||'';
-    setTimeout(() => { document.getElementById('scoreCircle').style.strokeDashoffset = 377-(score/100*377); }, 300);
-    document.getElementById('scoreTags').innerHTML = (d.score_tags||[]).map(t=>`<span class="score-tag ${t.type}">${t.text}</span>`).join('');
-
-    document.getElementById('speakerList').innerHTML = (d.speakers||[]).map((s,i)=>`
-      <div class="speaker-item">
-        <div class="speaker-header">
-          <div class="speaker-name"><div class="speaker-dot" style="background:${SPEAKER_COLORS[i%7]}"></div>${s.name}</div>
-          <div class="speaker-time">${s.duration} · ${s.percentage}%</div>
-        </div>
-        <div class="speaker-bar-track"><div class="speaker-bar-fill" style="background:${SPEAKER_COLORS[i%7]}" data-w="${s.percentage}"></div></div>
-      </div>`).join('') || '<div class="empty-state"><div class="empty-state-text">No speakers detected</div></div>';
-    setTimeout(()=>{ document.querySelectorAll('.speaker-bar-fill').forEach(b=>b.style.width=b.dataset.w+'%'); }, 300);
-
-    document.getElementById('timeline').innerHTML = (d.timeline||[]).map(t=>`
-      <div class="timeline-item">
-        <div class="timeline-dot">${t.emoji}</div>
-        <div class="timeline-content">
-          <div class="timeline-time">${t.time}</div>
-          <div class="timeline-text"><span class="timeline-highlight">${t.highlight}</span> — ${t.text}</div>
-        </div>
-      </div>`).join('') || '<div class="empty-state"><div class="empty-state-text">No timeline data</div></div>';
-
-    const acts = d.action_items||[];
-    document.getElementById('actionItems').innerHTML = acts.map((a,i)=>`
-      <div class="action-item" id="ac${i}" onclick="toggleAction(${i})">
-        <div class="action-checkbox"></div>
-        <div class="action-info">
-          <div class="action-text">${a.text}</div>
-          <div class="action-meta">
-            ${a.owner?`<span class="action-tag owner">👤 ${a.owner}</span>`:''}
-            ${a.deadline?`<span class="action-tag deadline">📅 ${a.deadline}</span>`:''}
-            ${a.priority==='High'?`<span class="action-tag priority">🔥 High</span>`:''}
-          </div>
-        </div>
-      </div>`).join('') || '<div class="empty-state"><div class="empty-state-text">No action items found</div></div>';
-    document.getElementById('actionCount').textContent = acts.length+' tasks';
-
-    document.getElementById('decisionsList').innerHTML = (d.decisions||[]).map(dec=>`
-      <div class="decision-item"><div class="decision-icon">⚡</div><div class="decision-text">${dec}</div></div>`).join('') || '<div class="empty-state"><div class="empty-state-text">No decisions extracted</div></div>';
-
-    const sent = d.sentiment||{positive:33,neutral:34,negative:33};
-    document.getElementById('sentimentGrid').innerHTML = `
-      <div class="sentiment-item"><div class="sentiment-emoji">😊</div><div class="sentiment-label">Positive</div><div class="sentiment-percent" style="color:var(--accent3)">${sent.positive}%</div></div>
-      <div class="sentiment-item"><div class="sentiment-emoji">😐</div><div class="sentiment-label">Neutral</div><div class="sentiment-percent" style="color:var(--text-secondary)">${sent.neutral}%</div></div>
-      <div class="sentiment-item"><div class="sentiment-emoji">😤</div><div class="sentiment-label">Tense</div><div class="sentiment-percent" style="color:var(--danger)">${sent.negative}%</div></div>`;
-
-    if (d.transcript) {
-      document.getElementById('transcriptBox').innerHTML = d.transcript.split('\n').map(l=>{
-        const m = l.match(/^(.+?):\s*(.*)/);
-        return m ? `<p><span class="transcript-speaker">${m[1]}</span>: ${m[2]}</p>` : `<p>${l}</p>`;
-      }).join('');
-    }
-
-    document.getElementById('results').classList.add('visible');
-    document.getElementById('results').scrollIntoView({ behavior: 'smooth', block: 'start' });
-    showToast('success', '🎉', 'Analysis complete! Report is ready.');
-  }
-
-  function getScoreLabel(s) {
-    if (s>=80) return 'Excellent Meeting'; if (s>=60) return 'Good Meeting';
-    if (s>=40) return 'Average Meeting'; if (s>=20) return 'Needs Improvement'; return 'Poor Meeting';
-  }
-
-  function toggleAction(i) {
-    document.getElementById(`ac${i}`).classList.toggle('checked');
-    const done = document.querySelectorAll('.action-item.checked').length;
-    const total = document.querySelectorAll('.action-item').length;
-    document.getElementById('actionCount').textContent = `${done}/${total} done`;
-  }
-
-  function setProgress(pct, text, stepId, done=false) {
-    document.getElementById('progressBar').style.width = pct+'%';
-    document.getElementById('progressPct').textContent = pct+'%';
-    document.getElementById('progressText').textContent = text;
-    ['step1','step2','step3','step4','step5'].forEach((s,i,arr) => {
-      const el = document.getElementById(s); const idx = arr.indexOf(stepId);
-      el.classList.remove('active','done');
-      if (i<idx) el.classList.add('done');
-      else if (i===idx) el.classList.add(done?'done':'active');
-    });
-  }
-
-  function delay(ms) { return new Promise(r=>setTimeout(r,ms)); }
-
-  function showToast(type, icon, text) {
-    const t = document.getElementById('toast');
-    t.className = `toast ${type}`;
-    document.getElementById('toastIcon').textContent = icon;
-    document.getElementById('toastText').textContent = text;
-    t.classList.add('show');
-    setTimeout(()=>t.classList.remove('show'), 3500);
-  }
-
-  function resetApp() {
-    removeFile();
-    document.getElementById('results').classList.remove('visible');
-    document.getElementById('progressSection').classList.remove('visible');
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-  }
-
-  function downloadReport() {
-    if (!analysisData) return;
-    const d = analysisData;
-    const txt = `MEETING AUTOPSY REPORT\nGenerated: ${new Date().toLocaleString()}\n${'='.repeat(50)}\n\nSCORE: ${d.score}/100 — ${d.score_label}\nDURATION: ${d.duration}\nPRODUCTIVE: ${d.productive_pct}%\nPARTICIPANTS: ${d.participants||d.speakers?.length||'?'}\n\n${'─'.repeat(50)}\nSPEAKERS\n${'─'.repeat(50)}\n${(d.speakers||[]).map(s=>`• ${s.name}: ${s.duration} (${s.percentage}%)`).join('\n')}\n\n${'─'.repeat(50)}\nKEY DECISIONS\n${'─'.repeat(50)}\n${(d.decisions||[]).map((x,i)=>`${i+1}. ${x}`).join('\n')}\n\n${'─'.repeat(50)}\nACTION ITEMS\n${'─'.repeat(50)}\n${(d.action_items||[]).map((a,i)=>`${i+1}. ${a.text}\n   Owner: ${a.owner||'?'} | Due: ${a.deadline||'TBD'} | Priority: ${a.priority||'Normal'}`).join('\n\n')}\n\n${'─'.repeat(50)}\nSENTIMENT\n${'─'.repeat(50)}\n😊 Positive: ${d.sentiment?.positive||0}%\n😐 Neutral: ${d.sentiment?.neutral||0}%\n😤 Tense: ${d.sentiment?.negative||0}%\n\n${'─'.repeat(50)}\nTRANSCRIPT\n${'─'.repeat(50)}\n${d.transcript||'N/A'}\n\n— MeetingAutopsy AI`;
-    const a = document.createElement('a');
-    a.href = URL.createObjectURL(new Blob([txt],{type:'text/plain'}));
-    a.download = `meeting-autopsy-${Date.now()}.txt`;
-    a.click();
-    showToast('success', '📥', 'Report downloaded!');
-  }
-</script>
+<script src="app.js"></script>
 </body>
 </html>
