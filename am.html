@@ -88,7 +88,7 @@
     <!-- Results Section -->
     <div class="results" id="results">
       <div class="results-header">
-        <div class="results-title">📊 Meeting Report</div>
+        <div class="results-title" id="resultsMainTitle">📊 Analysis & Intelligence Report</div>
         <div class="results-actions">
           <button class="btn-secondary" onclick="exportPDF()">📄 Export PDF</button>
           <button class="btn-secondary" onclick="downloadReport()">📥 Download TXT</button>
@@ -97,26 +97,107 @@
         </div>
       </div>
 
+      <!-- AI Video Intelligence & Classification Banner -->
+      <div class="video-classification-card" id="videoClassificationCard">
+        <div class="classification-left">
+          <div class="classification-badge-wrap">
+            <div class="classification-badge" id="classBadge">
+              <span class="classification-icon" id="classIcon">🌐</span>
+              <span class="classification-type" id="classType">Detecting Content Type...</span>
+            </div>
+            <div class="confidence-pill" id="classConfidence">96% Match</div>
+          </div>
+          <div class="classification-desc" id="classDesc">
+            AI is analyzing visual frames, speech patterns, and interaction dynamics to classify this media file.
+          </div>
+          <div class="classification-evidence" id="classEvidence">
+            <span class="evidence-tag">Analyzing frames...</span>
+          </div>
+        </div>
+        <div class="classification-right">
+          <div class="speaker-reality-badge" id="speakerRealityBadge">
+            <div class="speaker-reality-icon" id="speakerRealityIcon">👤</div>
+            <div>
+              <div class="speaker-reality-title" id="speakerRealityTitle">1 Solo Speaker Verified</div>
+              <div class="speaker-reality-sub" id="speakerRealitySub">100% solo speech · Zero cross-talk</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
       <div class="stats-grid">
         <div class="stat-card">
-          <div class="stat-label">Meeting Duration</div>
+          <div class="stat-label" id="lblDuration">Recording Duration</div>
           <div class="stat-value purple" id="statDuration">--</div>
           <div class="stat-sub">Total time</div>
         </div>
         <div class="stat-card green">
-          <div class="stat-label">Productive Time</div>
+          <div class="stat-label" id="lblProductive">Productive Speech</div>
           <div class="stat-value green" id="statProductive">--</div>
-          <div class="stat-sub">On-topic discussion</div>
+          <div class="stat-sub" id="lblProductiveSub">Active monologue / dialogue</div>
         </div>
         <div class="stat-card cyan">
-          <div class="stat-label">Participants</div>
+          <div class="stat-label" id="lblParticipants">Speakers</div>
           <div class="stat-value cyan" id="statParticipants">--</div>
-          <div class="stat-sub">Unique speakers</div>
+          <div class="stat-sub" id="lblParticipantsSub">Solo voice verified</div>
         </div>
         <div class="stat-card amber">
-          <div class="stat-label">Action Items</div>
+          <div class="stat-label" id="lblActions">Actionable Items</div>
           <div class="stat-value amber" id="statActions">--</div>
-          <div class="stat-sub">Tasks identified</div>
+          <div class="stat-sub" id="lblActionsSub">Key tasks identified</div>
+        </div>
+      </div>
+
+      <!-- Face Recognition & Active Speaker Tracker Card -->
+      <div class="card" id="faceRecognitionCard" style="margin-bottom:24px;">
+        <div class="card-header">
+          <div class="card-title">
+            <div class="card-title-icon" style="background:rgba(139,92,246,0.18);">👤</div>
+            <span>Face Recognition & Active Speaker Tracker</span>
+            <div class="face-detection-badge" id="faceDetectionBadge">
+              <span class="face-detection-status-dot"></span>
+              <span id="faceDetectionBadgeText">Deep Neural Vision Ready</span>
+            </div>
+          </div>
+          <div id="faceMemberCount" style="font-size:13px;color:var(--text-muted);font-weight:600;">0 Members Detected</div>
+        </div>
+
+        <div class="face-analysis-summary" id="faceAnalysisSummary">
+          <div class="face-summary-title">
+            <span>👁️ Visual Biometric Verification</span>
+            <span class="face-summary-pill" id="faceSummaryStatus">Analyzing Video...</span>
+          </div>
+          <div class="face-summary-desc" id="faceSummaryDesc">
+            AI face detection (YuNet) and deep neural recognition (SFace) verify participants and active speakers across the timeline.
+          </div>
+        </div>
+
+        <!-- Members Gallery -->
+        <div style="margin-bottom:20px;">
+          <div style="font-size:13px;font-weight:700;color:var(--text-primary);margin-bottom:12px;display:flex;align-items:center;gap:8px;">
+            <span>👥 Verified Video Members</span>
+            <span style="font-size:11px;color:var(--text-muted);font-weight:normal;">(Extracted & clustered via AI Face Recognition)</span>
+          </div>
+          <div class="members-gallery" id="membersGallery">
+            <div class="empty-state"><div class="empty-state-text">Member faces will appear after analysis</div></div>
+          </div>
+        </div>
+
+        <!-- Speaker Time Mapping -->
+        <div class="speaker-time-mapping">
+          <div class="speaker-time-header">
+            <div class="speaker-time-title">
+              <span>⏱️ Active Speaker Timeline (Kis Time Kon Bol Raha Hai)</span>
+              <span style="font-size:11px;color:var(--text-muted);font-weight:normal;">Timestamp-accurate voice & face sync</span>
+            </div>
+            <div style="font-size:12px;color:var(--accent);font-weight:600;" id="speakerActiveSummary">1 Speaker Active</div>
+          </div>
+          <div class="speaker-time-track" id="speakerTimeTrack" title="Interactive visual speaker timeline">
+            <!-- Dynamic colored blocks for timeline -->
+          </div>
+          <div class="speaker-intervals-list" id="speakerIntervalsList">
+            <div class="empty-state"><div class="empty-state-text">Speaker time intervals will appear here</div></div>
+          </div>
         </div>
       </div>
 
@@ -126,9 +207,10 @@
             <div class="card-header">
               <div class="card-title">
                 <div class="card-title-icon" style="background:rgba(139,92,246,0.15);">🏆</div>
-                Meeting Health Score
+                <span id="titleHealthCard">Meeting Health Score</span>
               </div>
             </div>
+
             <div class="score-display">
               <div class="score-circle-wrap">
                 <svg class="score-svg" viewBox="0 0 140 140">
@@ -155,7 +237,7 @@
             <div class="card-header">
               <div class="card-title">
                 <div class="card-title-icon" style="background:rgba(6,182,212,0.15);">📅</div>
-                Meeting Timeline
+                <span id="titleTimelineCard">Meeting Timeline</span>
               </div>
             </div>
             <div class="timeline" id="timeline"><div class="empty-state"><div class="empty-state-text">Timeline will appear after analysis</div></div></div>
@@ -165,7 +247,7 @@
             <div class="card-header">
               <div class="card-title">
                 <div class="card-title-icon" style="background:rgba(16,185,129,0.15);">📝</div>
-                Full Transcribed Speech
+                <span id="titleTranscriptCard">Full Transcribed Speech</span>
               </div>
               <button class="copy-btn" id="transcriptCopyBtn" onclick="copyTranscript()" style="display:none;" title="Copy entire transcript">
                 📋 Copy
@@ -180,7 +262,7 @@
             <div class="card-header">
               <div class="card-title">
                 <div class="card-title-icon" style="background:rgba(6,182,212,0.15);">🎤</div>
-                Speaker Breakdown
+                <span id="titleSpeakersCard">Speaker Breakdown</span>
               </div>
             </div>
             <div class="speaker-list" id="speakerList"><div class="empty-state"><div class="empty-state-text">Speaker data will appear after analysis</div></div></div>
@@ -190,7 +272,7 @@
             <div class="card-header">
               <div class="card-title">
                 <div class="card-title-icon" style="background:rgba(245,158,11,0.15);">⚡</div>
-                Key Decisions & Takeaways
+                <span id="titleDecisionsCard">Key Decisions & Takeaways</span>
               </div>
             </div>
             <div class="decisions-list" id="decisionsList"><div class="empty-state"><div class="empty-state-text">Decisions will appear after analysis</div></div></div>
@@ -200,7 +282,7 @@
             <div class="card-header">
               <div class="card-title">
                 <div class="card-title-icon" style="background:rgba(16,185,129,0.15);">💭</div>
-                Meeting Sentiment
+                <span id="titleSentimentCard">Meeting Sentiment</span>
               </div>
             </div>
             <div class="sentiment-grid" id="sentimentGrid">
@@ -216,10 +298,11 @@
         <div class="card-header">
           <div class="card-title">
             <div class="card-title-icon" style="background:rgba(239,68,68,0.15);">✅</div>
-            Action Items
+            <span id="titleActionsCard">Action Items</span>
           </div>
           <div id="actionCount" style="font-size:13px;color:var(--text-muted);">0 tasks</div>
         </div>
+
         <div class="action-items" id="actionItems"><div class="empty-state"><div class="empty-state-text">Action items will appear after analysis</div></div></div>
       </div>
 
@@ -237,11 +320,11 @@
         </div>
         <div class="chat-messages" id="chatMessages"></div>
         <div class="chat-suggestions" id="chatSuggestions">
+          <span class="chat-suggestion" onclick="sendSuggestion(this)">👤 Is video me kitne member join hain?</span>
+          <span class="chat-suggestion" onclick="sendSuggestion(this)">⏱️ Kis time kon bol raha hai?</span>
           <span class="chat-suggestion" onclick="sendSuggestion(this)">📋 Summarize key points</span>
           <span class="chat-suggestion" onclick="sendSuggestion(this)">🎯 What were the main decisions?</span>
-          <span class="chat-suggestion" onclick="sendSuggestion(this)">⚡ Who should follow up on action items?</span>
-          <span class="chat-suggestion" onclick="sendSuggestion(this)">😊 What was the overall mood?</span>
-          <span class="chat-suggestion" onclick="sendSuggestion(this)">💡 Speaker ne AI ke baare me kya bola?</span>
+          <span class="chat-suggestion" onclick="sendSuggestion(this)">🛠️ Recommended UI/UX fixes</span>
         </div>
         <div class="chat-input-area">
           <div class="chat-input-wrap">
@@ -255,19 +338,67 @@
   </main>
 </div>
 
-<!-- API Key Modal -->
+<!-- Universal AI Key Modal -->
 <div class="modal-overlay" id="modalOverlay" onclick="closeModalOutside(event)">
   <div class="modal">
-    <div class="modal-icon">⚡</div>
-    <div class="modal-title">AI Engine Settings</div>
-    <div class="modal-desc">MeetingAutopsy includes a <strong>Dedicated Python Speech AI Engine</strong> that transcribes actual audio with &gt;85% accuracy locally. You can also optionally connect Google Gemini API for cloud processing.</div>
-    <input type="password" class="modal-input" id="apiKeyInput" placeholder="Enter Gemini API key (optional)..." />
-    <br/>
-    <a href="https://aistudio.google.com/app/apikey" target="_blank" class="modal-link">🔗 Get your free API key from Google AI Studio</a>
-    <br/><br/>
-    <div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap;">
-      <button class="modal-btn" onclick="saveApiKey()">Save & Connect Cloud</button>
-      <button class="modal-btn" style="background:rgba(255,255,255,0.08);border:1px solid var(--border);" onclick="useLocalAiOnly()">Use Built-in Local AI</button>
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
+      <div style="display:flex;align-items:center;gap:10px;">
+        <div class="modal-icon" style="margin-bottom:0;font-size:32px;">🌐</div>
+        <div>
+          <div class="modal-title" style="margin-bottom:2px;font-size:18px;">Universal AI Provider Settings</div>
+          <div style="font-size:12px;color:var(--text-muted);">Use ChatGPT, Gemini, Groq, Claude, or Local AI</div>
+        </div>
+      </div>
+      <button class="chat-close-btn" onclick="closeModal()" title="Close">✕</button>
+    </div>
+
+    <div class="modal-desc" style="margin-bottom:16px;">
+      Connect your preferred AI platform. Paste your API key below — MeetingAutopsy will <strong>auto-detect</strong> your platform or you can select it manually.
+    </div>
+
+    <!-- Provider Selection -->
+    <div style="margin-bottom:12px;">
+      <label style="display:block;font-size:12px;font-weight:700;color:var(--text-secondary);margin-bottom:6px;">AI Platform / Provider</label>
+      <select class="modal-select" id="aiProviderSelect" onchange="onAiProviderChange()">
+        <option value="auto">🤖 Auto-Detect (Paste any key: ChatGPT, Gemini, Groq...)</option>
+        <option value="openai">🟢 OpenAI (ChatGPT · GPT-4o & Whisper)</option>
+        <option value="gemini">🔵 Google Gemini (Gemini 2.0 / 1.5 Flash)</option>
+        <option value="groq">⚡ Groq Cloud (Ultra-Fast Whisper + Llama 3.3)</option>
+        <option value="claude">🟣 Anthropic Claude (Claude 3.5 Sonnet / Haiku)</option>
+        <option value="custom">🌐 Custom OpenAI-Compatible (DeepSeek, Ollama, OpenRouter)</option>
+      </select>
+    </div>
+
+    <!-- API Key Input -->
+    <div style="margin-bottom:12px;">
+      <div style="display:flex;justify-content:space-between;font-size:12px;font-weight:700;color:var(--text-secondary);margin-bottom:6px;">
+        <span>API Key</span>
+        <span id="detectedProviderBadge" style="color:var(--accent);font-weight:700;"></span>
+      </div>
+      <input type="password" class="modal-input" id="apiKeyInput" placeholder="Paste your API key (e.g. sk-... or AIza...)" oninput="onApiKeyInput()" style="margin-bottom:6px;" />
+      <div style="display:flex;justify-content:space-between;align-items:center;">
+        <a id="providerDocLink" href="https://platform.openai.com/api-keys" target="_blank" class="modal-link" style="margin-bottom:0;font-size:11px;">🔗 Get your API key from OpenAI Platform</a>
+        <button type="button" onclick="toggleKeyVisibility()" style="background:none;border:none;color:var(--text-muted);font-size:11px;cursor:pointer;">👁️ Show/Hide</button>
+      </div>
+    </div>
+
+    <!-- Custom Base URL (Visible when custom selected) -->
+    <div id="customEndpointGroup" style="display:none;margin-bottom:12px;">
+      <label style="display:block;font-size:12px;font-weight:700;color:var(--text-secondary);margin-bottom:6px;">Custom API Base URL</label>
+      <input type="text" class="modal-input" id="customBaseUrlInput" placeholder="https://api.deepseek.com/v1" style="margin-bottom:4px;" />
+      <div style="font-size:11px;color:var(--text-muted);">Works with DeepSeek, Ollama (http://localhost:11434/v1), OpenRouter, etc.</div>
+    </div>
+
+    <!-- Optional Model Override -->
+    <div style="margin-bottom:18px;">
+      <label style="display:block;font-size:12px;font-weight:700;color:var(--text-secondary);margin-bottom:6px;">Model Name <span style="font-size:11px;color:var(--text-muted);font-weight:normal;">(Optional - leave blank for default)</span></label>
+      <input type="text" class="modal-input" id="aiModelInput" placeholder="Default: gpt-4o-mini / gemini-2.0-flash / llama-3.3-70b" style="margin-bottom:0;" />
+    </div>
+
+    <!-- Action Buttons -->
+    <div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap;">
+      <button class="modal-btn" style="flex:1;" onclick="saveApiKey()">Save & Connect</button>
+      <button class="modal-btn" style="background:rgba(255,255,255,0.08);border:1px solid var(--border);flex:1;" onclick="useLocalAiOnly()">Use Local AI Only</button>
     </div>
   </div>
 </div>

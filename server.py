@@ -6,6 +6,16 @@ and semantic analysis endpoints via local Python AI engine.
 
 import os
 import sys
+import io
+
+# Ensure UTF-8 output encoding across Windows shells and background logs
+if sys.platform == 'win32':
+    try:
+        sys.stdout.reconfigure(encoding='utf-8', errors='replace')
+        sys.stderr.reconfigure(encoding='utf-8', errors='replace')
+    except Exception:
+        pass
+
 import json
 import tempfile
 import urllib.parse
@@ -98,8 +108,8 @@ class MeetingAIHandler(SimpleHTTPRequestHandler):
                         f.write(chunk)
                         remaining -= len(chunk)
 
-            print(f"[Server] Received media upload: {os.path.getsize(temp_path)} bytes -> Running Real AI Analysis...")
-            report = meeting_analyzer.analyze_meeting(temp_path)
+            print(f"[Server] Received media upload: {os.path.getsize(temp_path)} bytes ({filename_header}) -> Running Real AI Analysis...")
+            report = meeting_analyzer.analyze_meeting(temp_path, original_filename=filename_header)
             
             response_json = json.dumps(report, ensure_ascii=False).encode('utf-8')
             self.send_response(200)
@@ -127,7 +137,17 @@ class MeetingAIHandler(SimpleHTTPRequestHandler):
 
     def handle_chat(self, content_length):
         try:
-            body = self.rfile.read(content_length).decode('utf-8', errors='ignore')
+            raw_bytes = self.rfile.read(content_length)
+            # Try utf-8 first, then utf-16, then latin-1 fallback
+            for enc in ['utf-8-sig', 'utf-8', 'utf-16', 'latin-1']:
+                try:
+                    body = raw_bytes.decode(enc)
+                    break
+                except UnicodeDecodeError:
+                    continue
+            else:
+                body = raw_bytes.decode('utf-8', errors='ignore')
+
             req = json.loads(body)
             query = req.get('query', '')
             data = req.get('data', {})
@@ -141,9 +161,12 @@ class MeetingAIHandler(SimpleHTTPRequestHandler):
             self.end_headers()
             self.wfile.write(resp_bytes)
         except Exception as e:
+            import traceback
+            traceback.print_exc()
             err_json = json.dumps({"error": str(e)}).encode('utf-8')
             self.send_response(500)
-            self.send_header('Content-Type', 'application/json')
+            self.send_header('Content-Type', 'application/json; charset=utf-8')
+            self.send_header('Content-Length', str(len(err_json)))
             self.end_headers()
             self.wfile.write(err_json)
 
